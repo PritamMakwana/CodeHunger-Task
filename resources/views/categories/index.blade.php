@@ -1,20 +1,13 @@
-<!doctype html>
-<html lang="en">
+@extends('include.admin')
 
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+@section('title','Categories')
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+@section('content')
+<div class="container-xxl flex-grow-1 container-p-y">
 
-    <title>Hello, world!</title>
-</head>
-
-<body>
+    @if (session('message'))
+    <div class="alert alert-success">{{ session('message') }}</div>
+    @endif
 
     {{-- Edit Modal --}}
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -70,6 +63,7 @@
 
 
     <div class="container py-5">
+
         <div class="row">
             <div class="col-md-12">
 
@@ -77,12 +71,7 @@
 
                 <div class="card">
                     <div class="card-header">
-                        {{-- <h4>
-                            Categories
-                            <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal"
-                                data-bs-target="#AddStudentModal">Add Student</button>
-                        </h4> --}}
-                        <h4>Import Categories</h4>
+                        <h4>Categories</h4>
                         <form action="/categories/import" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="file" name="file" accept=".xlsx">
@@ -128,160 +117,154 @@
     </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
-    </script>
+</div>
+@endsection
 
-    <script src="https://code.jquery.com/jquery-3.7.1.js"
-        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-    <script>
-        $(document).ready(function () {
+@section('script')
+<script>
+    $(document).ready(function () {
 
-    fetchCategories();
-    //1.fetch data
-     function fetchCategories(){
-     $.ajax({
-        type: "GET",
-        url: "/fetch-categories",
-        dataType: "json",
-        success: function (response) {
-            // console.log(response);
-            $('#tbody').html("");
-            $.each(response.categories, function (key, item) {
-                $('tbody').append('<tr>\
-                    <td>' + item.id + '</td>\
-                    <td>' + item.name + '</td>\
-                    <td><button type="button" value="' + item.id + '" class="btn btn-primary editbtn btn-sm">Edit</button></td>\
-                    <td><button type="button" value="' + item.id + '" class="btn btn-danger deletebtn btn-sm">Delete</button></td>\
-                \</tr>');
-            });
-          }
+fetchCategories();
+//1.fetch data
+ function fetchCategories(){
+ $.ajax({
+    type: "GET",
+    url: "/fetch-categories",
+    dataType: "json",
+    success: function (response) {
+        // console.log(response);
+        $('#tbody').html("");
+        $.each(response.categories, function (key, item) {
+            $('tbody').append('<tr>\
+                <td>' + item.id + '</td>\
+                <td>' + item.name + '</td>\
+                <td><button type="button" value="' + item.id + '" class="btn btn-primary editbtn btn-sm">Edit</button></td>\
+                <td><button type="button" value="' + item.id + '" class="btn btn-danger deletebtn btn-sm">Delete</button></td>\
+            \</tr>');
         });
+      }
+    });
+    }
+
+// 2.edit data
+$(document).on('click', '.editbtn', function (e) {
+        e.preventDefault();
+        var cate_id = $(this).val();
+        // alert(cate_id);
+        $('#editModal').modal('show');
+        $.ajax({
+            type: "GET",
+            url: "/edit-categories/" + cate_id,
+            success: function (response) {
+                if (response.status == 404) {
+                    $('#success_message').addClass('alert alert-success');
+                    $('#success_message').text(response.message);
+                    $('#editModal').modal('hide');
+                } else {
+                    // console.log(response.categories.name);
+                    $('#name').val(response.categories.name);
+                    $('#cate_id').val(cate_id);
+                }
+            }
+        });
+        $('.btn-close').find('input').val('');
+
+    });
+
+    $(document).on('click', '.update_category', function (e) {
+        e.preventDefault();
+
+        $(this).text('Updating..');
+        var id = $('#cate_id').val();
+        // alert(id);
+
+        var data = {
+            'name': $('#name').val(),
         }
 
-    // 2.edit data
-    $(document).on('click', '.editbtn', function (e) {
-            e.preventDefault();
-            var cate_id = $(this).val();
-            // alert(cate_id);
-            $('#editModal').modal('show');
-            $.ajax({
-                type: "GET",
-                url: "/edit-categories/" + cate_id,
-                success: function (response) {
-                    if (response.status == 404) {
-                        $('#success_message').addClass('alert alert-success');
-                        $('#success_message').text(response.message);
-                        $('#editModal').modal('hide');
-                    } else {
-                        // console.log(response.categories.name);
-                        $('#name').val(response.categories.name);
-                        $('#cate_id').val(cate_id);
-                    }
-                }
-            });
-            $('.btn-close').find('input').val('');
-
-        });
-
-        $(document).on('click', '.update_category', function (e) {
-            e.preventDefault();
-
-            $(this).text('Updating..');
-            var id = $('#cate_id').val();
-            // alert(id);
-
-            var data = {
-                'name': $('#name').val(),
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
-
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-            $.ajax({
-                type: "PUT",
-                url: "/update-categories/" + id,
-                data: data,
-                dataType: "json",
-                success: function (response) {
-                    // console.log(response);
-                    if (response.status == 400) {
-                        $('#update_msgList').html("");
-                        $('#update_msgList').addClass('alert alert-danger');
-                        $.each(response.errors, function (key, err_value) {
-                            $('#update_msgList').append('<li>' + err_value +
-                                '</li>');
-                        });
-                        $('.update_category').text('Update');
-                    } else {
-                        $('#update_msgList').html("");
-
-                        $('#success_message').addClass('alert alert-success');
-                        $('#success_message').text(response.message);
-                        $('#editModal').find('input').val('');
-                        $('.update_category').text('Update');
-                        $('#editModal').modal('hide');
-                        fetchCategories();
-                    }
-                }
-            });
-
         });
 
+        $.ajax({
+            type: "PUT",
+            url: "/update-categories/" + id,
+            data: data,
+            dataType: "json",
+            success: function (response) {
+                // console.log(response);
+                if (response.status == 400) {
+                    $('#update_msgList').html("");
+                    $('#update_msgList').addClass('alert alert-danger');
+                    $.each(response.errors, function (key, err_value) {
+                        $('#update_msgList').append('<li>' + err_value +
+                            '</li>');
+                    });
+                    $('.update_category').text('Update');
+                } else {
+                    $('#update_msgList').html("");
 
-
-
-
-    // 3.delete
-    $(document).on('click', '.deletebtn', function () {
-            var cate_id = $(this).val();
-            $('#DeleteModal').modal('show');
-            $('#deleteing_id').val(cate_id);
-            $('#deleteing_name').text('Id : '+cate_id);
-
+                    $('#success_message').addClass('alert alert-success');
+                    $('#success_message').text(response.message);
+                    $('#editModal').find('input').val('');
+                    $('.update_category').text('Update');
+                    $('#editModal').modal('hide');
+                    fetchCategories();
+                }
+            }
         });
 
-        $(document).on('click', '.delete_category', function (e) {
-            e.preventDefault();
+    });
 
-            $(this).text('Deleting..');
-            var id = $('#deleteing_id').val();
 
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+
+
+
+// 3.delete
+$(document).on('click', '.deletebtn', function () {
+        var cate_id = $(this).val();
+        $('#DeleteModal').modal('show');
+        $('#deleteing_id').val(cate_id);
+        $('#deleteing_name').text('Id : '+cate_id);
+
+    });
+
+    $(document).on('click', '.delete_category', function (e) {
+        e.preventDefault();
+
+        $(this).text('Deleting..');
+        var id = $('#deleteing_id').val();
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        $.ajax({
+            type: "DELETE",
+            url: "/delete-category/" + id,
+            dataType: "json",
+            success: function (response) {
+                // console.log(response);
+                if (response.status == 404) {
+                    $('#success_message').addClass('alert alert-success');
+                    $('#success_message').text(response.message);
+                    $('.delete_category').text('Yes Delete');
+                } else {
+                    $('#success_message').html("");
+                    $('#success_message').addClass('alert alert-success');
+                    $('#success_message').text(response.message);
+                    $('.delete_category').text('Yes Delete');
+                    $('#DeleteModal').modal('hide');
+                    fetchCategories();
                 }
-            });
-
-            $.ajax({
-                type: "DELETE",
-                url: "/delete-category/" + id,
-                dataType: "json",
-                success: function (response) {
-                    // console.log(response);
-                    if (response.status == 404) {
-                        $('#success_message').addClass('alert alert-success');
-                        $('#success_message').text(response.message);
-                        $('.delete_category').text('Yes Delete');
-                    } else {
-                        $('#success_message').html("");
-                        $('#success_message').addClass('alert alert-success');
-                        $('#success_message').text(response.message);
-                        $('.delete_category').text('Yes Delete');
-                        $('#DeleteModal').modal('hide');
-                        fetchCategories();
-                    }
-                }
-            });
+            }
         });
     });
-    </script>
+});
+</script>
 
-
-
-</body>
-
-</html>
+@endsection
