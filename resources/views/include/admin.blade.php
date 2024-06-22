@@ -83,12 +83,12 @@
                 </li>
 
 
-                {{-- <li class="menu-item {{Request::is('companies*') ? 'active':''}} ">
-                    <a href="{{url('/companies')}}" class="menu-link">
+                <li class="menu-item {{Request::is('products*') ? 'active':''}} ">
+                    <a href="{{ route('products') }}" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-collection"></i>
-                        <div>Companies</div>
+                        <div>Products</div>
                     </a>
-                </li> --}}
+                </li>
 
             </ul>
         </aside>

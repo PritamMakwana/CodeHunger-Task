@@ -36,12 +36,12 @@
                 <div class="d-flex align-items-end row">
                     <div class="col-sm-7">
                         <div class="card-body">
-                            <h5 class="card-title text-primary">Companies</h5>
+                            <h5 class="card-title text-primary">Products</h5>
                             <p class="mb-4 fs-1">
-                                {{ '$companies' }}
+                                {{ $Product }}
                             </p>
 
-                            <a href="{{url('/companies')}}" class="btn btn-sm btn-outline-primary">View All</a>
+                            <a href="{{route('products')}}" class="btn btn-sm btn-outline-primary">View All</a>
                         </div>
                     </div>
                 </div>

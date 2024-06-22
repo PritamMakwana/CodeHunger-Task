@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Products;
 use Illuminate\Http\Request;
 use App\Imports\CategoriesImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -29,13 +30,6 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'An error occurred while importing the file. Please make sure the file is correctly formatted.(only upload xlsx file)(only upload excel file one column');
         }
-        // Excel::import(new CategoriesImport, $request->file('file')->store('temp'));
-        // return redirect()->back()->with('success', 'Categories imported successfully');
-    }
-
-    public function showImportForm()
-    {
-        return view('categories.import');
     }
 
     public function index()
@@ -100,6 +94,8 @@ class CategoryController extends Controller
 
     public function deleteCategory($id)
     {
+        Products::where('category_name', $id)->delete();
+
         $categories = Category::find($id);
         if ($categories) {
             $categories->delete();
