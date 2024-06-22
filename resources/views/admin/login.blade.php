@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | Login </title>
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="https://quantumitinnovation.com/assets/images/logo/logo.png" />
+    <link rel="icon" type="image/x-icon"
+        href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAXVBMVEVHcEyTbWUsKiofHR0aGRkVFRUVFBQFBAQTEBAYFRQbGBgkIiI3LisAAAEeGxshICBJODUZFxZpIhNoHAuWNyS+Ox+8MxS/PyW/QCa7MhLBRy/MalfBRi7EUDrIWkNDvmbxAAAAH3RSTlMADVOPst7p//XYwW46/6SZIOPs/pfw/82q/3IjhVk0w2QZowAAAPVJREFUeAGlz4GORDAQBuApKJhl725aU7ve/zGPzi7lMskl+5FIM7/fgJTJ8qKsrK3Lpi3yrjdw0pUWD3a76j4Zr9Ptbm9DUa2zCLu9vEFcz1X2OrZ4DozxFRxgd0MJnOY5JEpMAnU8NJDqJZDU2RFOKnwHRtmnhQuzgo1sjBkojBWg6aTgDppCAgVo7hIYQGMl0OkB+2kAhR74+o5+QEMu8qCZOAYINEECzoBilgAH0NA/v8EPuDD+qIiecPJ0TLLY4l7SjtmztKY/wvRY5JXgmR0fncG9I3w8mGbYLSQjIZHL0oF4I0NmCvDHHCZP65z8FI7yX1mzGKFoi7UWAAAAAElFTkSuQmCC" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

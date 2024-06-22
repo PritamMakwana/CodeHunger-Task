@@ -22,15 +22,16 @@ class AdminAuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::guard('admin')->attempt($credentials)) {
-            return redirect()->intended('/admin/categories');
+            return redirect()->route('dashboard');
         }
 
-        return back()->with('fail', 'The provided credentials do not match our records is Wrong.');
+        return back()->with('fail', 'The provided credentials do not match our records.');
     }
 
     public function logout()
     {
         Auth::guard('admin')->logout();
-        return redirect('/admin/login');
+        return redirect()->route('admin.showLoginForm');
     }
+
 }
