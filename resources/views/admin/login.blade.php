@@ -63,7 +63,8 @@
                                     name="email" value="{{old('email')}}" autofocus />
 
                             </div>
-                            <span class="text-danger">@error('email')
+                            <span class="text-danger">
+                                @error('email')
                                 {{$message}}
                                 @enderror
                             </span>

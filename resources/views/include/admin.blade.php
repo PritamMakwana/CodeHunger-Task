@@ -11,6 +11,8 @@
 
     <meta name="description" content="" />
 
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css" />
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon"
         href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAXVBMVEVHcEyTbWUsKiofHR0aGRkVFRUVFBQFBAQTEBAYFRQbGBgkIiI3LisAAAEeGxshICBJODUZFxZpIhNoHAuWNyS+Ox+8MxS/PyW/QCa7MhLBRy/MalfBRi7EUDrIWkNDvmbxAAAAH3RSTlMADVOPst7p//XYwW46/6SZIOPs/pfw/82q/3IjhVk0w2QZowAAAPVJREFUeAGlz4GORDAQBuApKJhl725aU7ve/zGPzi7lMskl+5FIM7/fgJTJ8qKsrK3Lpi3yrjdw0pUWD3a76j4Zr9Ptbm9DUa2zCLu9vEFcz1X2OrZ4DozxFRxgd0MJnOY5JEpMAnU8NJDqJZDU2RFOKnwHRtmnhQuzgo1sjBkojBWg6aTgDppCAgVo7hIYQGMl0OkB+2kAhR74+o5+QEMu8qCZOAYINEECzoBilgAH0NA/v8EPuDD+qIiecPJ0TLLY4l7SjtmztKY/wvRY5JXgmR0fncG9I3w8mGbYLSQjIZHL0oF4I0NmCvDHHCZP65z8FI7yX1mzGKFoi7UWAAAAAElFTkSuQmCC" />
@@ -41,7 +43,6 @@
     <!-- Helpers -->
     <script src="{{ asset('assets/vendor/js/helpers.js')}}"></script>
     <script src="{{ asset('assets/js/config.js')}}"></script>
-    <script src="{{ asset('ckeditor/ckeditor.js')}}"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
 </head>
@@ -201,6 +202,8 @@
 </script>
 <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
     crossorigin="anonymous"></script>
+
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
 
 @yield('script')
 

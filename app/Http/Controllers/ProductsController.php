@@ -7,20 +7,23 @@ use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class ProductsController extends Controller
 {
     public function index()
     {
-        $products = Products::with('category')->orderBy('id', 'desc')->paginate(5);
         $categories = Category::all();
-        return view('products.index', compact('products', 'categories'));
+        return view('products.index', compact('categories'));
     }
 
     public function ajaxProducts()
     {
-        $products = Products::with('category')->orderBy('id', 'desc')->paginate(5);
-        return view('products.partials.table', compact('products'))->render();
+
+        $products = Products::with('category')->orderBy('id', 'desc')->get();
+        return response()->json([
+            'products' => $products,
+        ]);
     }
 
     public function store(Request $request)
@@ -60,6 +63,7 @@ class ProductsController extends Controller
     public function edit($id)
     {
         $products = Products::find($id);
+
         if ($products) {
             return response()->json([
                 'status' => 200,
@@ -76,9 +80,14 @@ class ProductsController extends Controller
 
     public function updateProduct(Request $request, $id)
     {
+
         $validator = Validator::make($request->all(), [
+            'category' => 'required',
             'name' => 'required|max:100',
+            'image' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+
 
         if ($validator->fails()) {
             return response()->json([
@@ -90,13 +99,27 @@ class ProductsController extends Controller
             $products = Products::where('id', $id)->first();
 
             if ($products) {
+
+                if ($request->hasFile('image')) {
+                    if ($products->image && Storage::exists('public/products/' . $products->image)) {
+                        Storage::delete('public/products/' . $products->image);
+                    }
+                    $file = $request->file('image');
+                    $filename = time() . '.' . $file->getClientOriginalExtension();
+                    $file->storeAs('public/products', $filename);
+                    $products->image = $filename;
+                }
                 $products->name = $request->input('name');
+                $products->category_name = $request->input('category');
                 $products->update();
+
                 return response()->json([
                     'status' => 200,
                     'message' => 'Product Updated Successfully.'
                 ]);
+
             } else {
+
                 return response()->json([
                     'status' => 404,
                     'message' => 'No Product Found.'
@@ -106,10 +129,16 @@ class ProductsController extends Controller
         }
     }
 
+
     public function destroy($id)
     {
         $Products = Products::find($id);
         if ($Products) {
+
+            if ($Products->image) {
+                Storage::delete('public/products/' . $Products->image);
+            }
+
             $Products->delete();
             return response()->json([
                 'status' => 200,

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Imports\CategoriesImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -59,7 +60,6 @@ class CategoryController extends Controller
                 'message' => 'No Category Found.'
             ]);
         }
-
     }
 
     public function updateCategories(Request $request, $id)
@@ -92,8 +92,17 @@ class CategoryController extends Controller
         }
     }
 
-    public function deleteCategory($id)
+    public function destroy($id)
     {
+
+        $products = Products::where('category_name', $id)->get();
+
+        foreach ($products as $product) {
+            if ($product->image) {
+                Storage::delete('public/products/' . $product->image);
+            }
+        }
+
         Products::where('category_name', $id)->delete();
 
         $categories = Category::find($id);
@@ -109,6 +118,7 @@ class CategoryController extends Controller
                 'message' => 'No category Found.'
             ]);
         }
+
     }
 
 

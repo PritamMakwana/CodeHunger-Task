@@ -98,9 +98,10 @@
                         @endif
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered">
+                        <table class="display" id="tableCategory">
                             <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Edit</th>
@@ -123,25 +124,28 @@
 @section('script')
 <script>
     $(document).ready(function () {
-
-fetchCategories();
+    var table = $('#tableCategory').DataTable();
+    fetchCategories();
 //1.fetch data
  function fetchCategories(){
- $.ajax({
+
+    $.ajax({
     type: "GET",
     url: "/fetch-categories",
     dataType: "json",
     success: function (response) {
-        // console.log(response);
-        $('#tbody').html("");
+        $('#tbody').empty();
+        table.clear().destroy();
         $.each(response.categories, function (key, item) {
             $('tbody').append('<tr>\
+                 <td>' + (key + 1) + '</td>\
                 <td>' + item.id + '</td>\
                 <td>' + item.name + '</td>\
                 <td><button type="button" value="' + item.id + '" class="btn btn-primary editbtn btn-sm">Edit</button></td>\
                 <td><button type="button" value="' + item.id + '" class="btn btn-danger deletebtn btn-sm">Delete</button></td>\
             \</tr>');
         });
+        table = $('#tableCategory').DataTable();
       }
     });
     }
@@ -211,16 +215,12 @@ $(document).on('click', '.editbtn', function (e) {
                     $('#editModal').find('input').val('');
                     $('.update_category').text('Update');
                     $('#editModal').modal('hide');
-                    fetchCategories();
+                    fetchCategories()
                 }
             }
         });
 
     });
-
-
-
-
 
 // 3.delete
 $(document).on('click', '.deletebtn', function () {

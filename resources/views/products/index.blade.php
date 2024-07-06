@@ -91,11 +91,30 @@
 
                     <input type="hidden" id="product_id" />
 
-
                     <div class="form-group mb-3">
                         <label for="">Product Name</label>
-                        <input type="text" id="name" required class="name form-control ">
+                        <input type="text" id="nameupdate" required class="nameupdate form-control ">
                     </div>
+                    <div class="form-group mb-3">
+                        <div class="col-sm-10">
+                            <label for="">Select Category</label>
+                            <select class="form-control category_name_editdt" name="category_name_editdt"
+                                id="category_name_editdt" required>
+                                @foreach ($categories as $category)
+                                <option value="{{ $category->id }}">
+                                    {{ $category->name }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="">Image</label>
+                        <input type="file" id="imageupdate" class="form-control image" name="imageupdate" />
+                    </div>
+
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -126,9 +145,24 @@
     <div class="card mb-4">
         <div class="card-body">
             <div id="success_message"></div>
+            <div class="table-responsive text-nowrap">
+                <table class="display" id="tableProduct">
+                    <thead>
+                        <tr class="text-nowrap">
+                            <th>#</th>
+                            <th>ID</th>
+                            <th>Category</th>
+                            <th>Product Name</th>
+                            <th>Image</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
 
-            <div class="table-responsive text-nowrap" id="products-table">
-                <!-- Table will be loaded here -->
+
             </div>
         </div>
     </div>
@@ -138,22 +172,37 @@
 
 @section('script')
 <script>
-    function fetchProducts(page) {
-        $.ajax({
-            url: "{{ route('products.ajax') }}?page=" + page,
-            success: function(data) {
-                $('#products-table').html(data);
-            }
-        });
-    }
     $(document).ready(function() {
+    var table = $('#tableProduct').DataTable();
+    fetchProducts();
+//1.fetch data
+ function fetchProducts(){
 
-        fetchProducts(1);
-        $(document).on('click', '.pagination a', function(event) {
-            event.preventDefault();
-            var page = $(this).attr('href').split('page=')[1];
-            fetchProducts(page);
-        });
+    $.ajax({
+    type: "GET",
+    url: "/products/ajax",
+    dataType: "json",
+    success: function (response) {
+        $('#tbody').empty();
+        table.clear().destroy();
+        $.each(response.products, function (key, item) {
+                    var imageUrl = item.image ? '{{ Storage::url('products/') }}' + item.image : 'https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg';
+                    $('#tbody').append('<tr>\
+                        <td>' + (key + 1) + '</td>\
+                        <td>' + item.id + '</td>\
+                        <td>' + item.category.name + '</td>\
+                        <td>' + item.name + '</td>\
+                        <td><img src="' + imageUrl + '" height="50"></td>\
+                        <td><button type="button" value="' + item.id + '" class="btn-sm btn-primary editbtn">Edit</button></td>\
+                        <td><button type="button" value="' + item.id + '" class="btn btn-danger deletebtn">Delete</button></td>\
+                    </tr>');
+                });
+        table = $('#tableProduct').DataTable();
+      }
+    });
+    }
+
+
 
 // add
     $(document).on('click', '.add_product', function (e) {
@@ -194,7 +243,7 @@
                         $('#AddProductModal').find('input').val('');
                         $('.add_product').text('Save');
                         $('#AddProductModal').modal('hide');
-                        fetchProducts(1);
+                        fetchProducts();
                     }
                 }
             });
@@ -213,13 +262,16 @@
                 type: "GET",
                 url: "/edit-products/" + product_id,
                 success: function (response) {
+                   // console.log(response);
                     if (response.status == 404) {
                         $('#success_message').addClass('alert alert-success');
                         $('#success_message').text(response.message);
                         $('#editModal').modal('hide');
                     } else {
-                        $('#name').val(response.products.name);
-                        $('#product_id').val(product_id);
+                         $('#nameupdate').val(response.products.name);
+                         $('#old_image').val(response.products.image);
+                         $('#category_name_editdt').val(response.products.category_name);
+                         $('#product_id').val(product_id);
                     }
                 }
             });
@@ -233,9 +285,22 @@
             $(this).text('Updating..');
             var id = $('#product_id').val();
 
-            var data = {
-            'name': $('#name').val(),
+            // var data = {
+            // 'name': $('#name').val(),
+            // }
+
+            var formData = new FormData();
+            formData.append('name', $('#nameupdate').val());
+            formData.append('category', $('#category_name_editdt').val());
+
+            var imageFile = $('#imageupdate')[0].files[0];
+            if (imageFile) {
+             formData.append('image', imageFile);
             }
+
+            // formData.forEach((value, key) => {
+            // console.log(key + ": " + value);
+            // });
 
             $.ajaxSetup({
                 headers: {
@@ -244,10 +309,11 @@
             });
 
             $.ajax({
-                type: "PUT",
+                type: "POST",
                 url: "/update-product/" + id,
-                data: data,
-                dataType: "json",
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function (response) {
                     // console.log(response);
                     if (response.status == 400) {
@@ -266,9 +332,10 @@
                         $('#editModal').find('input').val('');
                         $('.update_product').text('Update');
                         $('#editModal').modal('hide');
-                        fetchProducts(1);
+                        fetchProducts();
                     }
                 }
+
             });
 
         });
@@ -313,7 +380,7 @@
                         $('#success_message').text(response.message);
                         $('.delete_product').text('Yes Delete');
                         $('#DeleteModal').modal('hide');
-                        fetchProducts(1);
+                        fetchProducts();
                     }
                 }
             });
